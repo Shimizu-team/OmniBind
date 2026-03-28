@@ -1,0 +1,55 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Model checkpoint files
+*.pt
+*.pth
+*.ckpt
+
+# Large data files
+*.npy
+*.pkl
+*.pickle
+*.h5
+*.hdf5
+
+# Environment and logs
+.env
+*.log
+events.out.tfevents.*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Experiment tracking
+wandb/
+mlruns/
+outputs/
+runs/
+
+# Raw and processed data (keep READMEs)
+data/raw/
+data/processed/
+checkpoints/*.pt
+checkpoints/*.pth
+checkpoints/*.ckpt
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Virtual environments
+venv/
+.venv/
+env/

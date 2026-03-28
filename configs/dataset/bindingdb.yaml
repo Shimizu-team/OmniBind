@@ -1,0 +1,4 @@
+type: BindingDB
+
+data_dir: ./data/processed
+threshold: 6.5

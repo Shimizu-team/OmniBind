@@ -1,0 +1,132 @@
+# ---------- Overriding hydra default configs ----------
+hydra:
+  job:
+    name: omnibind
+  run:
+    dir: ./outputs/${hydra.job.name}/${now:%Y-%m-%d_%H-%M-%S}
+  output_subdir: null
+
+# ---------- Default settings ----------
+defaults:
+  - dataset: bindingdb
+  - optimizer: radam
+  - scheduler: cosine
+
+  # For hydra colorlog
+  - override hydra/job_logging: disabled
+  - override hydra/hydra_logging: disabled
+
+
+# ---------- Other configs ----------
+
+#====
+# Preprocessing
+#====
+preprocessing:
+  save_memory: true
+  max_atom_len: 60
+  max_aa_len: 4000
+
+
+#====
+# Model
+#====
+model:
+  type: aa3di_gmf  # Model type: 'aa', '3di', 'aa3di', 'aa3di_caf', 'aa3di_gmf'
+  atom_dim: 35
+  hid_dim: 768
+
+  encoder_aa:
+    hid_dim: 768
+    n_layers: 1
+    n_head: 8
+    dropout: 0.1
+
+  encoder_sa:
+    hid_dim: 768
+    n_layers: 1
+    n_head: 8
+    dropout: 0.1
+
+  protdecoder:
+    hid_dim: 768
+    n_layers: 1
+    n_head: 8
+    dropout: 0.1
+
+  decoder:
+    hid_dim: 768
+    n_layers: 1
+    n_head: 8
+    dropout: 0.1
+    hid_dim_fc: 256
+
+  cafb:
+    n_head: 8
+
+#====
+# Dataset
+#====
+dataset:
+  type: ???
+  data_dir: ???
+  threshold: 6.5
+
+#====
+# Training
+#====
+training:
+  project_name: omnibind
+  debug: false
+  seed: 0
+  gradient_clip_val: 1.0
+  accumulate_grad_batches: 1
+  device: cuda
+
+  epochs: 50
+  batch_size_train: 8
+  batch_size_valid: 8
+  pin_memory: true
+  num_workers: 4
+  cuda: true
+  drop_last: true
+  use_amp: true
+  use_mixed_precision: true
+  log_interval: 10
+  use_adasum: false
+  fp16_allreduce: true
+  gradient_predivide_factor: 1.0
+  decay_interval: 5
+  lr_decay: 1.0
+
+test:
+  checkpoint_path: null
+  batch_size: 4
+  save_memory_chunks: false
+  smiles: null
+  aa: null
+  sa: null
+  name: null
+
+
+#====
+# Optimizer
+#====
+optimizer:
+  type: ???
+  lr_head: ${optimizer.lr}
+
+
+#====
+# Scheduler
+#====
+scheduler:
+  type: ???
+  num_steps_per_epoch: null
+
+
+#====
+# Other essential configs
+#====
+out_dir: ./outputs
+quiet: false
