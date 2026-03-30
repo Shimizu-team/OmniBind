@@ -1,6 +1,6 @@
 # OmniBind
 
-**Unified and 3D-Structure-Informed Pan-Pharmacological Prediction of Drug-Target Interactions by OmniBind**
+**Pan–Pharmacological Drug–Target Interaction Prediction with 3D–Informed Protein Encoding at Scale**
 
 <!-- ![OmniBind Architecture](assets/architecture.png) -->
 
@@ -244,7 +244,7 @@ OmniBind/
 
 ```bibtex
 @article{omnibind2025,
-  title={Unified and 3D-Structure-Informed Pan-Pharmacological Prediction of Drug-Target Interactions by OmniBind},
+  title={Pan--Pharmacological Drug--Target Interaction Prediction with 3D--Informed Protein Encoding at Scale},
   author={},
   journal={},
   year={2025}
