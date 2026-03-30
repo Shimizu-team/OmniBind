@@ -22,7 +22,7 @@ OmniBind is a unified framework for predicting compound-protein interactions (CP
 
 ### Tested Environment
 
-- Ubuntu 20.04 LTS / 22.04 LTS
+- Red Hat Enterprise Linux 8.6
 - Python 3.8.17 (compatible with >= 3.9)
 - CUDA 12.1 / PyTorch 2.1.0
 
@@ -246,8 +246,8 @@ OmniBind/
 ```bibtex
 @article{omnibind2025,
   title={Pan--Pharmacological Drug--Target Interaction Prediction with 3D--Informed Protein Encoding at Scale},
-  author={},
-  journal={},
+  author={Kawaharada, Akinori and Ito, Takumi and Shimizu, Hideyuki},
+  journal={Preprint},
   year={2025}
 }
 ```

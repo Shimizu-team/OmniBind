@@ -15,6 +15,10 @@ Download the full BindingDB dataset from:
 
 Select "BindingDB_All.tsv" (tab-separated format).
 
+**Versions used in this study:**
+- **Label reversal experiments**: BindingDB January 2023 release
+- **Time-split experiments**: BindingDB January 2023 (training) and November 2024 (evaluation) releases
+
 ### 2. Protein 3D Structures (for Foldseek)
 
 Obtain PDB structures for target proteins. Sources:
