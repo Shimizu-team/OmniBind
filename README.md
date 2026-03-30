@@ -20,10 +20,11 @@ OmniBind is a unified framework for predicting compound-protein interactions (CP
 - hydra-core >= 1.3.0
 - See `requirements.txt` for full list
 
-### Tested Operating Systems
+### Tested Environment
 
 - Ubuntu 20.04 LTS / 22.04 LTS
-- CentOS 7/8
+- Python 3.8.17 (compatible with >= 3.9)
+- CUDA 12.1 / PyTorch 2.1.0
 
 ### Hardware Requirements
 
