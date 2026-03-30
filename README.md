@@ -16,8 +16,8 @@ OmniBind is a unified framework for predicting compound-protein interactions (CP
 - Python >= 3.9
 - PyTorch >= 2.0.0 (CUDA-enabled recommended)
 - RDKit >= 2022.9
-- TAPE (Task-Assessing Protein Embeddings) == 0.5
-- Hydra >= 1.3.0
+- tape-proteins == 0.5
+- hydra-core >= 1.3.0
 - See `requirements.txt` for full list
 
 ### Tested Operating Systems
@@ -84,7 +84,7 @@ cfg.model.type = "aa3di_gmf"
 cfg.training.device = "cuda"  # or "cpu"
 
 # Load model (requires trained checkpoint)
-model = load_model(cfg, "checkpoints/best_model.pth")
+model = load_model(cfg, "checkpoints/application.pth")
 
 # Predict binding affinity
 result = predict_single(
@@ -125,7 +125,7 @@ horovodrun -np 4 python scripts/train.py \
 ```bash
 python scripts/test.py \
     dataset.data_dir=./data/processed/seed42 \
-    test.checkpoint_path=./checkpoints/best_model.pth
+    test.checkpoint_path=./checkpoints/benchmark/seed42.pth
 ```
 
 ### Applications
@@ -134,7 +134,7 @@ python scripts/test.py \
 
 ```bash
 python scripts/drug_repositioning.py \
-    test.checkpoint_path=./checkpoints/best_model.pth \
+    test.checkpoint_path=./checkpoints/application.pth \
     test.smiles_file=compounds.csv \
     test.aa="<target_aa_sequence>" \
     test.sa="<target_3di_sequence>"
@@ -144,7 +144,7 @@ python scripts/drug_repositioning.py \
 
 ```bash
 python scripts/offtarget_screening.py \
-    test.checkpoint_path=./checkpoints/best_model.pth \
+    test.checkpoint_path=./checkpoints/application.pth \
     test.fixed_smiles="<compound_smiles>" \
     test.seq_pkl_path=proteins_seq.pkl \
     test.ss_pkl_path=proteins_ss.pkl
@@ -154,7 +154,7 @@ python scripts/offtarget_screening.py \
 
 ```bash
 python scripts/attention_map.py \
-    test.checkpoint_path=./checkpoints/best_model.pth \
+    test.checkpoint_path=./checkpoints/application.pth \
     test.smiles="<compound_smiles>" \
     test.aa="<aa_sequence>" \
     test.sa="<3di_sequence>" \
@@ -190,7 +190,7 @@ OmniBind trains all four affinity metrics (Ki, Kd, IC50, EC50) simultaneously vi
 ```bash
 python scripts/test.py \
     dataset.data_dir=./data/processed/seed42 \
-    test.checkpoint_path=./outputs/best_rmse_model_epoch1-.pth
+    test.checkpoint_path=./checkpoints/benchmark/seed42.pth
 ```
 
 ## Directory Structure

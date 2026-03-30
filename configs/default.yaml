@@ -107,6 +107,10 @@ test:
   aa: null
   sa: null
   name: null
+  smiles_file: null
+  fixed_smiles: null
+  seq_pkl_path: null
+  ss_pkl_path: null
 
 
 #====
