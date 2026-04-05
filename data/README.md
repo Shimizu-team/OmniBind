@@ -61,6 +61,12 @@ python data/preprocessing/make_sequence_id.py \
 
 Use [Foldseek](https://github.com/steineggerlab/foldseek) to obtain 3Di structural alphabet sequences from protein structures.
 
+**Option A: Using the Foldseek web server (recommended for small-scale use)**
+
+If you only have amino acid sequences (no PDB structures), you can use the [Foldseek web server](https://search.foldseek.com) to predict structures and obtain 3Di sequences directly from AA sequences. This requires no local installation.
+
+**Option B: Using Foldseek CLI (recommended for large-scale use)**
+
 ```bash
 # Create Foldseek structure database from PDB files
 foldseek createdb /path/to/pdb_structures/ structureDB
