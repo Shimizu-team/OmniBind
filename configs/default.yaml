@@ -34,29 +34,29 @@ preprocessing:
 model:
   type: aa3di_gmf  # Model type: 'aa', '3di', 'aa3di', 'aa3di_caf', 'aa3di_gmf'
   atom_dim: 35
-  hid_dim: 768
+  hid_dim: 256
 
   encoder_aa:
-    hid_dim: 768
-    n_layers: 1
+    hid_dim: 256
+    n_layers: 2
     n_head: 8
     dropout: 0.1
 
   encoder_sa:
-    hid_dim: 768
-    n_layers: 1
+    hid_dim: 256
+    n_layers: 2
     n_head: 8
     dropout: 0.1
 
   protdecoder:
-    hid_dim: 768
-    n_layers: 1
+    hid_dim: 256
+    n_layers: 2
     n_head: 8
     dropout: 0.1
 
   decoder:
-    hid_dim: 768
-    n_layers: 1
+    hid_dim: 256
+    n_layers: 5
     n_head: 8
     dropout: 0.1
     hid_dim_fc: 256
