@@ -5,9 +5,9 @@ Download from Zenodo and place them in this directory.
 
 ## Download
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19326040.svg)](https://doi.org/10.5281/zenodo.19326040)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.19326039.svg)](https://doi.org/10.5281/zenodo.19326039)
 
-Download URL: https://doi.org/10.5281/zenodo.19326040
+Download URL: https://doi.org/10.5281/zenodo.19326039
 
 After downloading, your directory should look like:
 
