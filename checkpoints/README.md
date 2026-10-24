@@ -27,8 +27,8 @@ checkpoints/
 
 | Checkpoint | Description | Used in |
 |------------|-------------|---------|
-| `benchmark/seed*.pth` | Best validation RMSE checkpoint for each of the five data splits (seeds 42, 123, 369, 777, 2024) | Performance evaluation (Table 1) |
-| `application.pth` | Best validation RMSE checkpoint (epoch 76) of the primary data split (seed 369) used throughout model development. Identical weights to `benchmark/seed369.pth`, provided separately for convenience. | Drug repositioning, attention analysis, off-target screening (Figures 3–5, Supplementary Figure S1) |
+| `benchmark/seed*.pth` | Best validation RMSE checkpoint for each of the five data splits (seeds 42, 123, 369, 777, 2024) | Performance evaluation (benchmarks) |
+| `application.pth` | Best validation RMSE checkpoint (epoch 76) of the primary data split (seed 369) used throughout model development. Identical weights to `benchmark/seed369.pth`, provided separately for convenience. | Drug repositioning, attention analysis, off-target screening (application analyses) |
 
 Benchmark results report mean ± std over the 5 data splits. All checkpoints were selected on the validation set; test sets were not used for model selection.
 
