@@ -5,7 +5,7 @@
 ![OmniBind Overview](assets/OmniBind_GA.png)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 
 OmniBind is a unified framework for predicting compound-protein interactions (CPIs) that simultaneously predicts four binding affinity metrics (Ki, Kd, IC50, EC50) using both amino acid sequences and 3Di structural alphabet sequences via adaptive gated fusion.
 
@@ -13,7 +13,7 @@ OmniBind is a unified framework for predicting compound-protein interactions (CP
 
 ### Software Dependencies
 
-- Python >= 3.9
+- Python >= 3.8 (the paper experiments used Python 3.8.12)
 - PyTorch >= 2.0.0 (CUDA-enabled recommended)
 - RDKit >= 2022.9
 - tape-proteins == 0.5
@@ -23,7 +23,7 @@ OmniBind is a unified framework for predicting compound-protein interactions (CP
 ### Tested Environment
 
 - Red Hat Enterprise Linux 8.6
-- Python 3.8.12 (compatible with >= 3.9)
+- Python 3.8.12
 - CUDA 12.1 / PyTorch 2.1.0
 
 ### Hardware Requirements
@@ -38,7 +38,7 @@ OmniBind is a unified framework for predicting compound-protein interactions (CP
 ### 1. Create conda environment
 
 ```bash
-conda create -n omnibind python=3.9 -y
+conda create -n omnibind python=3.8 -y
 conda activate omnibind
 ```
 
