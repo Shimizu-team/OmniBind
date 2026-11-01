@@ -8,9 +8,10 @@ hydra:
 
 # ---------- Default settings ----------
 defaults:
+  - _self_  # load this file first so that the config groups below override its placeholders
   - dataset: bindingdb
   - optimizer: radam
-  - scheduler: cosine
+  - scheduler: none  # constant learning rate (as in the paper)
 
   # For hydra colorlog
   - override hydra/job_logging: disabled
@@ -23,7 +24,7 @@ defaults:
 # Preprocessing
 #====
 preprocessing:
-  save_memory: true
+  save_memory: false  # if true, drop samples exceeding the limits below (not used in the paper)
   max_atom_len: 60
   max_aa_len: 4000
 
@@ -43,12 +44,6 @@ model:
     dropout: 0.1
 
   encoder_sa:
-    hid_dim: 256
-    n_layers: 2
-    n_head: 8
-    dropout: 0.1
-
-  protdecoder:
     hid_dim: 256
     n_layers: 2
     n_head: 8
@@ -75,23 +70,23 @@ dataset:
 #====
 # Training
 #====
+# Paper setting: 8 GPUs (Horovod) x batch 2 x 64 accumulation steps = effective batch 1,024.
+# Under Horovod the learning rate is scaled by the number of GPUs (1e-4 x 8 = 8e-4).
+# Mixed precision (AMP) is always used for training.
 training:
   project_name: omnibind
   debug: false
-  seed: 0
-  gradient_clip_val: 1.0
-  accumulate_grad_batches: 1
+  seed: 0  # weight-initialization seed (data split seeds are set in data/preprocessing/split_data.py)
+  accumulate_grad_batches: 64
   device: cuda
 
-  epochs: 50
-  batch_size_train: 8
+  epochs: 100
+  batch_size_train: 2
   batch_size_valid: 8
   pin_memory: true
   num_workers: 4
   cuda: true
   drop_last: true
-  use_amp: true
-  use_mixed_precision: true
   log_interval: 10
   use_adasum: false
   fp16_allreduce: true
