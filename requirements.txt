@@ -14,7 +14,6 @@ tqdm==4.66.5
 matplotlib==3.7.1
 biopython==1.83
 PyYAML==6.0.2
-transformers==4.44.2
 
 # Optional: Distributed training
 # horovod==0.28.1

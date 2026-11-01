@@ -210,8 +210,7 @@ OmniBind/
 ├── configs/                    # Hydra configuration files
 │   ├── default.yaml
 │   ├── dataset/
-│   ├── optimizer/
-│   └── scheduler/
+│   └── optimizer/
 ├── scripts/                    # Entry point scripts
 │   ├── train.py
 │   ├── test.py

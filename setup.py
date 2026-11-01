@@ -25,7 +25,6 @@ setup(
         "matplotlib==3.7.1",
         "biopython==1.83",
         "PyYAML==6.0.2",
-        "transformers==4.44.2",
     ],
     extras_require={
         "distributed": ["horovod==0.28.1"],
