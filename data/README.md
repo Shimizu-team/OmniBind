@@ -10,14 +10,14 @@ OmniBind uses [BindingDB](https://www.bindingdb.org/) as the primary training da
 
 ### 1. BindingDB
 
-Download the full BindingDB dataset from:
+Download the full BindingDB dataset (`BindingDB_All_YYYYmm_tsv`, tab-separated format) from:
 - https://www.bindingdb.org/rwd/bind/chemsearch/marvin/SDFdownload.jsp?all_download=yes
 
-Select "BindingDB_All.tsv" (tab-separated format).
-
 **Versions used in this study:**
-- **Label reversal experiments**: BindingDB January 2023 release
-- **Time-split experiments**: BindingDB January 2023 (training) and November 2024 (evaluation) releases
+- **Model development and label reversal experiments**: BindingDB May 2023 release
+- **Temporal validation**: BindingDB May 2023 (training) and November 2024 (evaluation) releases
+
+The BindingDB download page provides only the current release; BindingDB additionally maintains a quarterly archive of its full dataset at the UC San Diego Library Digital Collections (https://doi.org/10.6075/J0HD7VVF).
 
 ### 2. Protein 3D Structures (for Foldseek)
 
