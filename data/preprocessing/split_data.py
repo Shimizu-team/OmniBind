@@ -44,9 +44,11 @@ def split_bdb_data(data_dir: str, seed: int, output_dir: str = None):
     both_lgds = pos_lgds & neg_lgds
     print(f'Ligands in both: {len(both_lgds)}')
 
-    # Split test set from label-reversal ligands
+    # Split test set from label-reversal ligands. Ligands are sorted before
+    # sampling so that the split does not depend on set iteration order
+    # (which varies between Python processes for strings).
     random.seed(seed)
-    shuffle_lgds = random.sample(list(both_lgds), len(both_lgds))
+    shuffle_lgds = random.sample(sorted(both_lgds), len(both_lgds))
     tst_pos_lgds = set(shuffle_lgds[:50000])
     tst_neg_lgds = set(shuffle_lgds[50000:100000])
 
@@ -62,11 +64,11 @@ def split_bdb_data(data_dir: str, seed: int, output_dir: str = None):
     gc.collect()
 
     # Split train/validation from remaining ligands
-    lgds = list(set(tr_df.smiles))
+    lgds = sorted(set(tr_df.smiles))
     random.seed(seed)
-    random.shuffle(lgds)
-    va_lgds = set(lgds[:150000])
-    tr_lgds = set(lgds[150000:])
+    shuffle_lgds = random.sample(lgds, len(lgds))
+    va_lgds = set(shuffle_lgds[:150000])
+    tr_lgds = set(shuffle_lgds[150000:])
 
     train = tr_df.loc[tr_df['smiles'].apply(lambda x: x in tr_lgds)].reset_index(drop=True)
     valid = tr_df.loc[tr_df['smiles'].apply(lambda x: x in va_lgds)].reset_index(drop=True)
