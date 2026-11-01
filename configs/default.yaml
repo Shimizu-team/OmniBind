@@ -95,7 +95,7 @@ training:
 
 test:
   checkpoint_path: null
-  batch_size: 4
+  batch_size: 8
   save_memory_chunks: false
   smiles: null
   aa: null

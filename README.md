@@ -23,13 +23,13 @@ OmniBind is a unified framework for predicting compound-protein interactions (CP
 ### Tested Environment
 
 - Red Hat Enterprise Linux 8.6
-- Python 3.8.17 (compatible with >= 3.9)
+- Python 3.8.12 (compatible with >= 3.9)
 - CUDA 12.1 / PyTorch 2.1.0
 
 ### Hardware Requirements
 
 - **Minimum**: 1 NVIDIA GPU with >= 12 GB VRAM (e.g., RTX 3080)
-- **Recommended**: NVIDIA A100 (40 GB) or equivalent for training
+- **Recommended**: NVIDIA A100 (40 GB) or equivalent for training (the paper used 8 × A100 40 GB; 100 epochs take approximately 60 hours)
 - CPU-only inference is supported but significantly slower
 - Optional: Multiple GPUs with Horovod for distributed training
 
@@ -110,16 +110,19 @@ print(f"Predicted pEC50: {result['predicted_ec50']:.4f}")
 ### Training
 
 ```bash
+# Distributed training with Horovod (8 GPUs, as in the paper)
+horovodrun -np 8 python scripts/train.py \
+    dataset.data_dir=./data/processed/seed42
+
 # Single GPU training
 python scripts/train.py \
-    dataset.data_dir=./data/processed/seed42 \
-    training.epochs=50 \
-    training.batch_size_train=8
-
-# Distributed training with Horovod (4 GPUs)
-horovodrun -np 4 python scripts/train.py \
     dataset.data_dir=./data/processed/seed42
 ```
+
+The default configuration (`configs/default.yaml`) uses the training settings of the paper: RAdam optimizer (learning rate 1e-4, weight decay 1e-4) with a constant learning rate, 100 epochs, batch size 2 per GPU with 64 gradient accumulation steps, and mixed precision (AMP).
+
+- With Horovod, the learning rate is scaled linearly by the number of GPUs (8e-4 on 8 GPUs), and the effective batch size is 2 × 64 × 8 = 1,024. On a single GPU, the effective batch size is 128 and the learning rate is not scaled.
+- After each epoch, the checkpoint with the lowest validation RMSE averaged over the four endpoints is saved as `best_rmse_model_epoch*-.pth` in `out_dir`.
 
 ### Testing
 
@@ -173,26 +176,30 @@ python scripts/attention_map.py \
 To reproduce the paper experiments:
 
 1. Download and preprocess BindingDB data (see `data/README.md`)
-2. Train models with 5 random seeds:
+2. Train one model on each of the five data splits:
 
 ```bash
 for seed in 42 123 369 777 2024; do
-    python scripts/train.py \
+    horovodrun -np 8 python scripts/train.py \
         dataset.data_dir=./data/processed/seed${seed} \
-        training.seed=${seed} \
-        training.epochs=50
+        out_dir=./outputs/seed${seed}
 done
 ```
 
-OmniBind trains all four affinity metrics (Ki, Kd, IC50, EC50) simultaneously via multi-task learning.
+The seed selects the data split (see `data/README.md`); model weights are initialized with the same fixed seed (`training.seed=0`) in all runs, as in the paper. OmniBind trains all four affinity metrics (Ki, Kd, IC50, EC50) simultaneously via multi-task learning.
 
-3. Evaluate on test sets:
+3. Evaluate on the test set of each split:
 
 ```bash
-python scripts/test.py \
-    dataset.data_dir=./data/processed/seed42 \
-    test.checkpoint_path=./checkpoints/benchmark/seed42.pth
+for seed in 42 123 369 777 2024; do
+    python scripts/test.py \
+        dataset.data_dir=./data/processed/seed${seed} \
+        test.checkpoint_path=./checkpoints/benchmark/seed${seed}.pth \
+        out_dir=./outputs/seed${seed}
+done
 ```
+
+Results in the paper are reported as mean ± standard deviation over the five splits.
 
 ## Directory Structure
 
