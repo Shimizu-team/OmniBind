@@ -244,7 +244,6 @@ OmniBind/
 | `aa` | AA-only | Amino acid sequence |
 | `3di` | 3Di-only | 3Di structural alphabet |
 | `aa3di` | Simple fusion | AA + 3Di (addition) |
-| `aa3di_caf` | Cross-attention fusion | AA + 3Di (bidirectional attention) |
 | `aa3di_gmf` | **Gated fusion (default)** | AA + 3Di (adaptive gating) |
 
 ## Citation

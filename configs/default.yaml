@@ -32,7 +32,7 @@ preprocessing:
 # Model
 #====
 model:
-  type: aa3di_gmf  # Model type: 'aa', '3di', 'aa3di', 'aa3di_caf', 'aa3di_gmf'
+  type: aa3di_gmf  # Model type: 'aa', '3di', 'aa3di', 'aa3di_gmf'
   atom_dim: 35
   hid_dim: 256
 
@@ -54,9 +54,6 @@ model:
     n_head: 8
     dropout: 0.1
     hid_dim_fc: 256
-
-  cafb:
-    n_head: 8
 
 #====
 # Dataset

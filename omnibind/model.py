@@ -1,10 +1,9 @@
 """Model architectures for compound-protein interaction prediction.
 
-Includes five model variants:
+Includes four model variants:
 - CPIModelAA: amino acid sequence only
 - CPIModel3Di: 3Di structural alphabet only
 - CPIModelAA3Di: simple addition fusion of AA + 3Di
-- CPIModelAA3DiwithCAF: cross-attention fusion of AA + 3Di
 - CPIModelAA3DiwithGMF: gated mechanism fusion of AA + 3Di (default)
 """
 
@@ -301,59 +300,6 @@ class CPIModelAA3Di(_CPIBase):
         return aa_src, sa_src, pro_src, maps
 
 
-class CrossAttentionFusionBlock(nn.Module):
-    """Bidirectional cross-attention fusion between AA and 3Di representations."""
-
-    def __init__(self, cfg):
-        super().__init__()
-        self.cross_attn_AtoS = nn.MultiheadAttention(
-            cfg.model.encoder_aa.hid_dim, cfg.model.cafb.n_head)
-        self.cross_attn_StoA = nn.MultiheadAttention(
-            cfg.model.encoder_sa.hid_dim, cfg.model.cafb.n_head)
-
-    def forward(self, encoder_aa_output, encoder_sa_output, sa_mask):
-        # AA as query, 3Di as key/value
-        attn_output_sa, _ = self.cross_attn_AtoS(
-            query=encoder_aa_output, key=encoder_sa_output,
-            value=encoder_sa_output, key_padding_mask=sa_mask)
-        # 3Di as query, AA as key/value
-        attn_output_aa, _ = self.cross_attn_StoA(
-            query=encoder_sa_output, key=encoder_aa_output,
-            value=encoder_aa_output, key_padding_mask=sa_mask)
-        return attn_output_sa + attn_output_aa
-
-
-class CPIModelAA3DiwithCAF(_CPIBase):
-    """CPI model with cross-attention fusion of AA and 3Di."""
-
-    def __init__(self, aa_encoder: EncoderofAA, sa_encoder: Encoderof3Di,
-                 decoder: Decoder, cafb: CrossAttentionFusionBlock, cfg):
-        super().__init__(cfg)
-        self.aa_encoder = aa_encoder
-        self.sa_encoder = sa_encoder
-        self.decoder = decoder
-        self.cafb = cafb
-
-    def forward(self, compound, adj, aa, sa, atom_num, aa_num, sa_num):
-        compound, compound_mask, aa_mask, sa_mask = self._prepare(
-            compound, adj, aa, sa, atom_num, aa_num, sa_num)
-        aa_src, aa_mask = self.aa_encoder(aa, aa_mask)
-        sa_src, sa_mask = self.sa_encoder(sa, sa_mask)
-        aa_src = aa_src[1:-1, :, :]
-        pro_src = self.cafb(aa_src, sa_src, sa_mask)
-        return self.decoder(compound, pro_src, compound_mask, sa_mask)
-
-    def get_attn_maps(self, compound, adj, aa, sa, atom_num, aa_num, sa_num):
-        compound, compound_mask, aa_mask, sa_mask = self._prepare(
-            compound, adj, aa, sa, atom_num, aa_num, sa_num)
-        aa_src, aa_mask = self.aa_encoder(aa, aa_mask)
-        sa_src, sa_mask = self.sa_encoder(sa, sa_mask)
-        aa_src = aa_src[1:-1, :, :]
-        pro_src = self.cafb(aa_src, sa_src, sa_mask)
-        maps = self.decoder.get_attn_maps(compound, pro_src, compound_mask, sa_mask)
-        return aa_src, sa_src, pro_src, maps
-
-
 class GateMechanismFusionBlock(nn.Module):
     """Adaptive gated fusion of AA and 3Di representations.
 
@@ -425,9 +371,6 @@ def build_model(cfg):
         return CPIModel3Di(sa_encoder, decoder, cfg)
     elif model_type == 'aa3di':
         return CPIModelAA3Di(aa_encoder, sa_encoder, decoder, cfg)
-    elif model_type == 'aa3di_caf':
-        cafb = CrossAttentionFusionBlock(cfg)
-        return CPIModelAA3DiwithCAF(aa_encoder, sa_encoder, decoder, cafb, cfg)
     elif model_type == 'aa3di_gmf':
         return CPIModelAA3DiwithGMF(aa_encoder, sa_encoder, decoder, cfg)
     else:
