@@ -169,7 +169,7 @@ python scripts/attention_map.py \
 
 - **SMILES**: Standard SMILES notation for compounds
 - **AA sequence**: Single-letter amino acid sequence (uppercase)
-- **3Di sequence**: Foldseek 3Di structural alphabet sequence (20-letter alphabet)
+- **3Di sequence**: Foldseek 3Di structural alphabet sequence (20-letter alphabet), predicted from the amino acid sequence with ProstT5 (see `data/README.md`)
 
 ## Reproduction
 

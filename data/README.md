@@ -2,7 +2,7 @@
 
 ## Overview
 
-OmniBind uses [BindingDB](https://www.bindingdb.org/) as the primary training data source, with protein 3Di structural alphabet sequences obtained via [Foldseek](https://github.com/steineggerlab/foldseek).
+OmniBind uses [BindingDB](https://www.bindingdb.org/) as the primary training data source. Protein 3Di structural alphabet sequences are predicted directly from amino acid sequences with the [ProstT5](https://huggingface.co/Rostlab/ProstT5) protein language model, accessed through [Foldseek](https://github.com/steineggerlab/foldseek), so no experimental or predicted 3D structures are required.
 
 **Note**: Raw data files are not included in this repository due to their size. Follow the instructions below to download and preprocess the data.
 
@@ -18,12 +18,6 @@ Download the full BindingDB dataset (`BindingDB_All_YYYYmm_tsv`, tab-separated f
 - **Temporal validation**: BindingDB May 2023 (training) and November 2024 (evaluation) releases
 
 The BindingDB download page provides only the current release; BindingDB additionally maintains a quarterly archive of its full dataset at the UC San Diego Library Digital Collections (https://doi.org/10.6075/J0HD7VVF).
-
-### 2. Protein 3D Structures (for Foldseek)
-
-Obtain PDB structures for target proteins. Sources:
-- [AlphaFold Protein Structure Database](https://alphafold.ebi.ac.uk/)
-- [RCSB PDB](https://www.rcsb.org/)
 
 ## Preprocessing Pipeline
 
@@ -57,34 +51,33 @@ python data/preprocessing/make_sequence_id.py \
 - `data/processed/seq_2_id.pkl` — `{aa_sequence: int_id}`
 - `data/processed/bdb_sequences.fasta` — FASTA for Foldseek input
 
-### Step 3: Generate 3Di sequences with Foldseek
+### Step 3: Predict 3Di sequences with ProstT5
 
-Use [Foldseek](https://github.com/steineggerlab/foldseek) to obtain 3Di structural alphabet sequences from protein structures.
-
-**Option A: Using the Foldseek web server (recommended for small-scale use)**
-
-If you only have amino acid sequences (no PDB structures), you can use the [Foldseek web server](https://search.foldseek.com) to predict structures and obtain 3Di sequences directly from AA sequences. This requires no local installation.
-
-**Option B: Using Foldseek CLI (recommended for large-scale use)**
+3Di sequences are predicted from the amino acid sequences in `bdb_sequences.fasta`
+(Step 2) using the ProstT5 protein language model through Foldseek. No 3D
+structures are required.
 
 ```bash
-# Create Foldseek structure database from PDB files
-foldseek createdb /path/to/pdb_structures/ structureDB
+# One-time: download the ProstT5 model weights
+foldseek databases ProstT5 weights tmp
 
-# Extract 3Di sequences
-foldseek lndb structureDB_h structureDB_ss_h
-foldseek convert2fasta structureDB_ss structureDB_ss.fasta
+# Predict 3Di sequences from the amino acid FASTA
+# (append --gpu 1 to run inference on a GPU instead of the CPU)
+foldseek createdb ./data/processed/bdb_sequences.fasta seqDB --prostt5-model weights
+
+# Export the predicted 3Di sequences as FASTA
+foldseek lndb seqDB_h seqDB_ss_h
+foldseek convert2fasta seqDB_ss seqDB_ss.fasta
 ```
 
-Then create `id_2_ss.pkl` by mapping each protein ID to its 3Di sequence. This mapping must use the same integer IDs from Step 2 (`id_2_seq.pkl`).
+The FASTA headers are the integer protein IDs assigned in Step 2, so the output
+can be converted into the `id_2_ss.pkl` mapping directly:
 
 ```python
-# Example script to create id_2_ss.pkl
 import pickle
 
-# Parse Foldseek output FASTA
 id_2_ss = {}
-with open('structureDB_ss.fasta') as f:
+with open('seqDB_ss.fasta') as f:
     current_id = None
     for line in f:
         if line.startswith('>'):
@@ -95,6 +88,9 @@ with open('structureDB_ss.fasta') as f:
 with open('./data/processed/id_2_ss.pkl', 'wb') as f:
     pickle.dump(id_2_ss, f)
 ```
+
+For a small number of proteins, the [Foldseek web server](https://search.foldseek.com)
+can be used instead of a local installation.
 
 **Output:**
 - `data/processed/id_2_ss.pkl` — `{int_id: 3di_sequence}`
