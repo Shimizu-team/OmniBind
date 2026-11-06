@@ -57,6 +57,9 @@ python data/preprocessing/make_sequence_id.py \
 (Step 2) using the ProstT5 protein language model through Foldseek. No 3D
 structures are required.
 
+The 3Di sequences used in this study were generated with Foldseek 9.427df8a
+(bioconda build `pl5321hb365157_0`).
+
 ```bash
 # One-time: download the ProstT5 model weights
 foldseek databases ProstT5 weights tmp
@@ -151,6 +154,59 @@ data/processed/seed42/
 ```
 
 **Important**: Each label npy file has shape `(N, 1)` where `-1` indicates a missing value for that sample. The model uses masked multi-task learning, computing loss only on valid (non -1) entries.
+
+## Temporal Validation Set
+
+The temporal validation set is built from two BindingDB releases: the release
+used for training (May 2023) and a later one (November 2024). An interaction
+record of the later release is kept when its compound-protein pair is not
+present in the earlier release, so the set consists of interaction pairs that
+were newly deposited after the training data was collected. Compounds and
+proteins themselves may already occur in the training data; only the pair is
+new.
+
+### Step T1: Extract newly deposited interaction pairs
+
+```bash
+python data/preprocessing/make_temporal_set.py \
+    --train_tsv /path/to/BindingDB_All_2023m5.tsv \
+    --test_tsv /path/to/BindingDB_All_2024m11.tsv \
+    --output_dir ./data/processed/temporal
+```
+
+**Output** (same file names as Step 1, in a separate directory):
+- `data/processed/temporal/BindingDB_all_affinities.pkl`
+- `data/processed/temporal/BindingDB_Ki.pkl`, `BindingDB_Kd.pkl`, `BindingDB_IC50.pkl`, `BindingDB_EC50.pkl`
+
+### Step T2: Sequence IDs, 3Di sequences and protein IDs
+
+Run Steps 2 to 4 on the temporal directory. The commands are identical, with
+`--data_dir ./data/processed/temporal`; the 3Di sequences are predicted from
+`data/processed/temporal/bdb_sequences.fasta` exactly as in Step 3.
+
+```bash
+python data/preprocessing/make_sequence_id.py --data_dir ./data/processed/temporal
+# ... predict 3Di as in Step 3 and write id_2_ss.pkl into the same directory ...
+python data/preprocessing/add_ids_to_bdb.py --data_dir ./data/processed/temporal
+```
+
+### Step T3: Convert to numpy arrays
+
+`convert_to_npy.py` expects the split naming used in Step 5, so the combined
+pickle is copied once under the `test` suffix:
+
+```bash
+cp ./data/processed/temporal/BindingDB_all_affinities.pkl \
+   ./data/processed/temporal/BindingDB_all_affinities_test.pkl
+
+python data/preprocessing/convert_to_npy.py \
+    --data_dir ./data/processed/temporal \
+    --source_dir ./data/processed/temporal \
+    --output_suffix test
+```
+
+The resulting arrays can be evaluated with `scripts/test.py` by pointing
+`dataset.data_dir` at `./data/processed/temporal`.
 
 ## Sample Data
 
