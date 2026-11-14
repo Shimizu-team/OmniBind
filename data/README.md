@@ -210,7 +210,18 @@ The resulting arrays can be evaluated with `scripts/test.py` by pointing
 
 ## Sample Data
 
-A small sample dataset is provided in `data/sample/sample_cpi.csv` for testing and demonstration purposes.
+`data/sample/` holds small datasets for the demo in the main README and for the
+notebooks in `notebooks/`. They are not used for training or evaluation.
+
+| File | Contents |
+|------|----------|
+| `sample_proteins.csv` | 100 human proteins: UniProt accession, gene name, amino acid sequence and the matching 3Di sequence. Includes the clozapine and clomipramine targets, ABL1, MAP2K1, PDE5A, KLKB1 and SIRT3, plus unrelated proteins as background. |
+| `sample_compounds.csv` | 40 compounds (ZINC ID and SMILES) drawn from the FDA-approved library used in the paper. |
+| `sample_cpi.csv` | A few compound-protein pairs with affinity labels, illustrating the column layout of the processed data. |
+
+Sequences are taken from the UniProt reviewed human proteome; the 3Di sequences were
+predicted with ProstT5 exactly as in Step 3 above. Every protein satisfies the model's
+requirement that the amino acid and 3Di sequences have the same length.
 
 ## Full Directory Structure After Preprocessing
 
