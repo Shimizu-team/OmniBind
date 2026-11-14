@@ -5,7 +5,7 @@
 ![OmniBind Overview](assets/OmniBind_GA.png)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.8-3.11](https://img.shields.io/badge/python-3.8--3.11-blue.svg)](https://www.python.org/downloads/)
 
 OmniBind is a unified framework for predicting compound-protein interactions (CPIs) that simultaneously predicts four binding affinity metrics (Ki, Kd, IC50, EC50) using both amino acid sequences and 3Di structural alphabet sequences via adaptive gated fusion.
 
@@ -13,7 +13,7 @@ OmniBind is a unified framework for predicting compound-protein interactions (CP
 
 ### Software Dependencies
 
-- Python >= 3.8 (the paper experiments used Python 3.8.12)
+- Python 3.8 to 3.11 (the paper experiments used Python 3.8.12)
 - PyTorch >= 2.0.0 (CUDA-enabled recommended)
 - RDKit >= 2022.9
 - hydra-core >= 1.3.0
@@ -21,9 +21,10 @@ OmniBind is a unified framework for predicting compound-protein interactions (CP
 
 ### Tested Environment
 
-- Red Hat Enterprise Linux 8.6
-- Python 3.8.12
-- CUDA 12.1 / PyTorch 2.1.0
+- Red Hat Enterprise Linux 8.6, Python 3.8.12, CUDA 12.1 / PyTorch 2.1.0 (training
+  and all results in the paper)
+- macOS 26.6 (Apple silicon), Python 3.8.20 and 3.11.15, PyTorch 2.1.0 on the CPU
+  (installation, the demo below and the notebooks)
 
 ### Hardware Requirements
 
@@ -38,12 +39,16 @@ OmniBind is a unified framework for predicting compound-protein interactions (CP
 ### 1. Create an environment
 
 ```bash
-conda create -n omnibind python=3.8 -y
+conda create -n omnibind python=3.11 -y
 conda activate omnibind
 ```
 
-Any environment manager works; `python -m venv` is equivalent. Python 3.8 to 3.11
-are supported, since the pinned dependencies have no wheels for Python 3.12 or newer.
+Any environment manager works; `python -m venv` is equivalent.
+
+Python 3.8 to 3.11 are supported; the pinned dependencies have no wheels for Python
+3.12 or newer. We recommend 3.11, which we verified gives predictions identical to the
+Python 3.8.12 used for the paper. Python 3.8 reached end of life in October 2024, so
+use it only to match the original environment exactly.
 
 ### 2. Install OmniBind and its dependencies
 
