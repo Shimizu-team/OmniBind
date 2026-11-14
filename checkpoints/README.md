@@ -39,6 +39,14 @@ checkpoints/
 
 Benchmark results report mean ± std over the 5 data splits. All checkpoints were selected on the validation set; test sets were not used for model selection.
 
+**These checkpoints belong to the original data splits, which the preprocessing
+pipeline no longer regenerates bit-for-bit.** Evaluating them on a split regenerated
+from BindingDB puts compounds from their training set into the test set and inflates
+the scores. To re-derive the benchmark numbers, retrain on the regenerated splits;
+see "A note on the data splits" in the main README. For inference and for the
+application analyses, which involve no held-out split, these checkpoints are the
+weights used in the paper.
+
 ## Checkpoint Format
 
 Each checkpoint file (`.pth`) contains:

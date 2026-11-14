@@ -174,6 +174,10 @@ python scripts/test.py \
     test.checkpoint_path=./checkpoints/benchmark/seed42.pth
 ```
 
+`dataset.data_dir` must point at the split the checkpoint was trained on. The
+distributed `benchmark/seed*.pth` files belong to the original splits, which cannot be
+regenerated; see [A note on the data splits](#a-note-on-the-data-splits).
+
 ### Applications
 
 #### Drug Repositioning (batch compound screening)
@@ -230,18 +234,37 @@ done
 
 The seed selects the data split (see `data/README.md`); model weights are initialized with the same fixed seed (`training.seed=0`) in all runs, as in the paper. OmniBind trains all four affinity metrics (Ki, Kd, IC50, EC50) simultaneously via multi-task learning.
 
-3. Evaluate on the test set of each split:
+3. Evaluate each trained model on the test set of its own split. Training writes a
+   `best_rmse_model_epoch*-.pth` file whenever the validation RMSE improves, so the
+   last one is the best checkpoint:
 
 ```bash
 for seed in 42 123 369 777 2024; do
+    ckpt=$(ls -v ./outputs/seed${seed}/best_rmse_model_epoch*-.pth | tail -1)
     python scripts/test.py \
         dataset.data_dir=./data/processed/seed${seed} \
-        test.checkpoint_path=./checkpoints/benchmark/seed${seed}.pth \
+        test.checkpoint_path=${ckpt} \
         out_dir=./outputs/seed${seed}
 done
 ```
 
 Results in the paper are reported as mean ± standard deviation over the five splits.
+
+### A note on the data splits
+
+The checkpoints distributed on Zenodo were trained on the original splits, and those
+splits cannot be regenerated bit-for-bit. `split_data.py` now sorts the ligands before
+sampling, so that a given seed always yields the same split; the original runs did not
+sort, and the selection therefore depended on Python's per-process string hashing,
+which is randomized unless `PYTHONHASHSEED` is fixed. Regenerated splits are
+deterministic, but they are not the splits of the paper.
+
+Consequently, **do not evaluate the distributed checkpoints on a regenerated split**:
+compounds held out in the regenerated test set may have been in the original training
+set, which inflates the scores. Retrain on the regenerated splits as in step 2 and
+evaluate those models, as the commands above do; expect numbers close to, but not
+identical to, the published ones. The distributed checkpoints are intended for
+inference and for the application analyses, where no held-out split is involved.
 
 ## Directory Structure
 
