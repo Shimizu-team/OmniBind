@@ -267,5 +267,7 @@ data/
 │       ├── ic50_test.npy
 │       └── ec50_test.npy
 └── sample/
+    ├── sample_proteins.csv
+    ├── sample_compounds.csv
     └── sample_cpi.csv
 ```

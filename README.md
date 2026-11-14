@@ -249,7 +249,7 @@ Results in the paper are reported as mean ± standard deviation over the five sp
 OmniBind/
 ├── omnibind/                   # Core library
 │   ├── __init__.py
-│   ├── model.py                # Model architectures (5 variants)
+│   ├── model.py                # Model architectures (4 variants)
 │   ├── data_utils.py           # Dataset and collation
 │   ├── featurization.py        # Molecular and protein featurization
 │   ├── train.py                # Training loop (single/distributed)

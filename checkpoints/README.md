@@ -9,7 +9,14 @@ Download from Zenodo and place them in this directory.
 
 Download URL: https://doi.org/10.5281/zenodo.19326039
 
-After downloading, your directory should look like:
+The record contains a single archive, `checkpoints.zip`. Unpack it in the repository
+root; it expands into this `checkpoints/` directory:
+
+```bash
+unzip checkpoints.zip
+```
+
+The result should look like:
 
 ```
 checkpoints/
