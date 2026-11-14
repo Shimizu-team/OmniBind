@@ -16,9 +16,8 @@ OmniBind is a unified framework for predicting compound-protein interactions (CP
 - Python >= 3.8 (the paper experiments used Python 3.8.12)
 - PyTorch >= 2.0.0 (CUDA-enabled recommended)
 - RDKit >= 2022.9
-- tape-proteins == 0.5
 - hydra-core >= 1.3.0
-- See `requirements.txt` for full list
+- See `requirements.txt` for the full, version-pinned list
 
 ### Tested Environment
 
@@ -30,42 +29,46 @@ OmniBind is a unified framework for predicting compound-protein interactions (CP
 
 - **Minimum**: 1 NVIDIA GPU with >= 12 GB VRAM (e.g., RTX 3080)
 - **Recommended**: NVIDIA A100 (40 GB) or equivalent for training (the paper used 8 × A100 40 GB; 100 epochs take approximately 60 hours)
-- CPU-only inference is supported but significantly slower
+- A GPU is required for training only. Inference, including every notebook in
+  `notebooks/`, runs on the CPU in seconds
 - Optional: Multiple GPUs with Horovod for distributed training
 
 ## Installation Guide
 
-### 1. Create conda environment
+### 1. Create an environment
 
 ```bash
 conda create -n omnibind python=3.8 -y
 conda activate omnibind
 ```
 
-### 2. Install PyTorch (with CUDA)
+Any environment manager works; `python -m venv` is equivalent. Python 3.8 to 3.11
+are supported, since the pinned dependencies have no wheels for Python 3.12 or newer.
 
-```bash
-# For CUDA 12.1 (adjust for your CUDA version)
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
-```
-
-### 3. Install RDKit
-
-```bash
-conda install -c conda-forge rdkit -y
-```
-
-### 4. Install OmniBind and dependencies
+### 2. Install OmniBind and its dependencies
 
 ```bash
 pip install -r requirements.txt
 pip install -e .
 ```
 
-### 5. (Optional) Install Horovod for distributed training
+This installs the CPU build of PyTorch, which is all that inference needs. RDKit is
+included in `requirements.txt`, so it does not have to be installed separately.
+
+### 3. (Optional) Install the CUDA build of PyTorch for training
 
 ```bash
-HOROVOD_WITH_PYTORCH=1 pip install horovod
+# For CUDA 12.1 (adjust for your CUDA version)
+pip install --force-reinstall torch==2.1.0 --index-url https://download.pytorch.org/whl/cu121
+```
+
+Run this **after** step 2: installing `requirements.txt` afterwards would replace the
+CUDA build with the CPU one.
+
+### 4. (Optional) Install Horovod for distributed training
+
+```bash
+HOROVOD_WITH_PYTORCH=1 pip install horovod==0.28.1
 ```
 
 Typical installation time: **5-15 minutes** on a standard desktop computer.
@@ -74,24 +77,32 @@ Typical installation time: **5-15 minutes** on a standard desktop computer.
 
 ### Quick inference with sample data
 
+`data/sample/sample_proteins.csv` ships 100 human proteins, each with the two
+sequences the model needs: the amino acid sequence and the matching 3Di structural
+alphabet sequence. The example below predicts the four affinity endpoints for
+imatinib against ABL1, its clinical target.
+
+Download the weights first (see `checkpoints/README.md`), then run:
+
 ```python
-from omnibind.model import build_model
-from omnibind.predict import predict_single, load_model
+import pandas as pd
 from omegaconf import OmegaConf
 
-# Load config
+from omnibind.predict import load_model, predict_single
+
 cfg = OmegaConf.load("configs/default.yaml")
 cfg.model.type = "aa3di_gmf"
-cfg.training.device = "cuda"  # or "cpu"
+cfg.training.device = "cpu"      # or "cuda"
 
-# Load model (requires trained checkpoint)
 model = load_model(cfg, "checkpoints/application.pth")
 
-# Predict binding affinity
+proteins = pd.read_csv("data/sample/sample_proteins.csv").set_index("gene_name")
+target = proteins.loc["ABL1"]
+
 result = predict_single(
     smiles="CN1CCN(Cc2ccc(cc2)C(=O)Nc2ccc(C)c(Nc3nccc(n3)-c3cccnc3)c2)CC1",  # Imatinib
-    aa_sequence="MSHHWGYGKHNGPEHWHK...",  # Target protein AA sequence
-    sa_sequence="DAFCDPPRRLVPCCVPQV...",  # Target protein 3Di sequence
+    aa_sequence=target["aa_sequence"],
+    sa_sequence=target["3di_sequence"],
     model=model,
     cfg=cfg,
 )
@@ -101,9 +112,35 @@ print(f"Predicted pIC50: {result['predicted_ic50']:.4f}")
 print(f"Predicted pEC50: {result['predicted_ec50']:.4f}")
 ```
 
-**Expected output**: Four predicted affinity values (pKi, pKd, pIC50, pEC50), each typically in the range of 3-12.
+**Expected output**:
 
-**Demo run time**: < 1 second per compound-protein pair on a standard GPU.
+```
+Predicted pKi:   5.80
+Predicted pKd:   5.17
+Predicted pIC50: 5.67
+Predicted pEC50: 5.43
+```
+
+Values are on the p-scale (`-log10(M)`) and typically fall between 3 and 12. The last
+decimals may differ slightly between platforms.
+
+**Demo run time**: well under a second per compound-protein pair on a laptop CPU.
+
+### Tutorials
+
+The notebooks in `notebooks/` reproduce the three application analyses of the paper
+on the sample data. Each runs end to end on a CPU in a few seconds.
+
+| Notebook | Analysis |
+|----------|----------|
+| `notebooks/01_drug_repositioning.ipynb` | Rank a compound library against one target |
+| `notebooks/02_attention_map.ipynb` | Residue-level attention for a compound-protein pair |
+| `notebooks/03_offtarget_screening.ipynb` | Rank a protein set for one compound |
+
+```bash
+pip install notebook
+jupyter notebook notebooks/
+```
 
 ## Usage
 
@@ -224,9 +261,16 @@ OmniBind/
 │   ├── attention_map.py
 │   ├── drug_repositioning.py
 │   └── offtarget_screening.py
+├── notebooks/                  # Tutorials for the application analyses
+│   ├── 01_drug_repositioning.ipynb
+│   ├── 02_attention_map.ipynb
+│   └── 03_offtarget_screening.ipynb
 ├── data/
 │   ├── README.md               # Data download and preprocessing instructions
-│   ├── sample/                 # Sample data for demo
+│   ├── sample/                 # Sample data for the demo and notebooks
+│   │   ├── sample_proteins.csv     # 100 human proteins (AA + 3Di sequences)
+│   │   ├── sample_compounds.csv    # 40 FDA-approved compounds
+│   │   └── sample_cpi.csv          # Example compound-protein pairs
 │   └── preprocessing/          # Data preprocessing scripts
 ├── checkpoints/
 │   └── README.md               # Download instructions for pre-trained weights
