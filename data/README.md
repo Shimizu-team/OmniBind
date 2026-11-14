@@ -215,12 +215,13 @@ notebooks in `notebooks/`. They are not used for training or evaluation.
 
 | File | Contents |
 |------|----------|
-| `sample_proteins.csv` | 100 human proteins: UniProt accession, gene name, amino acid sequence and the matching 3Di sequence. Includes the clozapine and clomipramine targets, ABL1, MAP2K1, PDE5A, KLKB1 and SIRT3, plus unrelated proteins as background. |
+| `sample_proteins.csv` | 102 human proteins: UniProt accession, gene name, amino acid sequence and the matching 3Di sequence. Includes the clozapine and clomipramine targets, ABL1, MAP2K1, PDE5A, KLKB1 and SIRT3, plus unrelated proteins as background. The last two entries, `ABL1_KD` and `ABL1_KD_T315I`, are the 293-residue ABL1 kinase domain used in the attention analysis and its T315I resistance mutant. |
 | `sample_compounds.csv` | 40 compounds (ZINC ID and SMILES) drawn from the FDA-approved library used in the paper. |
 | `sample_cpi.csv` | A few compound-protein pairs with affinity labels, illustrating the column layout of the processed data. |
 
 Sequences are taken from the UniProt reviewed human proteome; the 3Di sequences were
-predicted with ProstT5 exactly as in Step 3 above. Every protein satisfies the model's
+predicted with ProstT5 exactly as in Step 3 above. The 3Di sequences of the two kinase
+domain entries were predicted from their own amino acid sequences in the same way. Every protein satisfies the model's
 requirement that the amino acid and 3Di sequences have the same length.
 
 ## Full Directory Structure After Preprocessing

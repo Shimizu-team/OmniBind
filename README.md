@@ -82,7 +82,7 @@ Typical installation time: **5-15 minutes** on a standard desktop computer.
 
 ### Quick inference with sample data
 
-`data/sample/sample_proteins.csv` ships 100 human proteins, each with the two
+`data/sample/sample_proteins.csv` ships 102 human proteins, each with the two
 sequences the model needs: the amino acid sequence and the matching 3Di structural
 alphabet sequence. The example below predicts the four affinity endpoints for
 imatinib against ABL1, its clinical target.
@@ -273,7 +273,7 @@ OmniBind/
 ├── data/
 │   ├── README.md               # Data download and preprocessing instructions
 │   ├── sample/                 # Sample data for the demo and notebooks
-│   │   ├── sample_proteins.csv     # 100 human proteins (AA + 3Di sequences)
+│   │   ├── sample_proteins.csv     # 102 human proteins (AA + 3Di sequences)
 │   │   ├── sample_compounds.csv    # 40 FDA-approved compounds
 │   │   └── sample_cpi.csv          # Example compound-protein pairs
 │   └── preprocessing/          # Data preprocessing scripts
