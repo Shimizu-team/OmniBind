@@ -54,3 +54,6 @@ venv/
 .venv/
 env/
 CLAUDE.md
+
+# Jupyter
+.ipynb_checkpoints/
