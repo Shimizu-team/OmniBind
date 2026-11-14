@@ -137,6 +137,12 @@ for seed in 42 123 369 777 2024; do
 done
 ```
 
+This step also applies the length filters used in the paper: samples whose SMILES is
+longer than 500 characters (`--smiles_max_len`) or whose protein sequence is longer
+than 1,500 residues (`--seq_max_len`) are dropped. Those are the defaults, so the npy
+files hold fewer samples than the pickle files of Step 5; the script prints how many
+were removed.
+
 **Output** (per seed):
 ```
 data/processed/seed42/
