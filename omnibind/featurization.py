@@ -4,12 +4,24 @@ Converts SMILES strings to atom feature matrices and adjacency matrices,
 and protein sequences to token ID arrays.
 """
 
+from typing import Optional
+
 import numpy as np
 from rdkit import Chem
-from tape import TAPETokenizer
-import torch
 
 NUM_ATOM_FEAT = 35
+
+# Amino acid vocabulary of tape-proteins 0.5 (tape/tokenizers.py, IUPAC_VOCAB).
+# It is reproduced here so that OmniBind does not depend on tape-proteins, whose
+# own dependency chain no longer installs on current Python versions. The token
+# IDs must not be changed: the trained embedding layer depends on them.
+IUPAC_VOCAB = {
+    '<pad>': 0, '<mask>': 1, '<cls>': 2, '<sep>': 3, '<unk>': 4,
+    'A': 5, 'B': 6, 'C': 7, 'D': 8, 'E': 9, 'F': 10, 'G': 11, 'H': 12,
+    'I': 13, 'K': 14, 'L': 15, 'M': 16, 'N': 17, 'O': 18, 'P': 19, 'Q': 20,
+    'R': 21, 'S': 22, 'T': 23, 'U': 24, 'V': 25, 'W': 26, 'X': 27, 'Y': 28,
+    'Z': 29,
+}
 
 # 3Di structural alphabet to index mapping (Foldseek format)
 ALPHABET_TO_INDEX = {
@@ -111,22 +123,50 @@ def mol_features_from_smiles(smiles: str) -> tuple:
     return mol_features_from_mol(mol)
 
 
-def encode_aa_sequence(sequence: str, tokenizer: TAPETokenizer = None) -> np.ndarray:
-    """Encode amino acid sequence to token IDs using TAPE tokenizer.
+class ProteinTokenizer:
+    """Amino acid tokenizer over the IUPAC vocabulary.
+
+    Produces the same token IDs as ``TAPETokenizer(vocab='iupac')`` of
+    tape-proteins 0.5: one token per character, wrapped in ``<cls>``/``<sep>``.
+    """
+
+    def __init__(self) -> None:
+        self.vocab = dict(IUPAC_VOCAB)
+
+    def encode(self, sequence: str) -> np.ndarray:
+        """Encode an amino acid sequence to token IDs.
+
+        Args:
+            sequence: Amino acid sequence string (uppercase one-letter codes).
+
+        Returns:
+            1D numpy array of token IDs, of length ``len(sequence) + 2``.
+
+        Raises:
+            KeyError: If the sequence contains a character outside the vocabulary.
+        """
+        tokens = ['<cls>'] + list(sequence) + ['<sep>']
+        try:
+            token_ids = [self.vocab[token] for token in tokens]
+        except KeyError as exc:
+            raise KeyError(f"Unrecognized token: '{exc.args[0]}'") from None
+        return np.array(token_ids, dtype=np.int64)
+
+
+def encode_aa_sequence(sequence: str,
+                       tokenizer: Optional[ProteinTokenizer] = None) -> np.ndarray:
+    """Encode amino acid sequence to token IDs.
 
     Args:
         sequence: Amino acid sequence string.
-        tokenizer: TAPETokenizer instance (created if None).
+        tokenizer: ProteinTokenizer instance (created if None).
 
     Returns:
         1D numpy array of token IDs.
     """
     if tokenizer is None:
-        tokenizer = TAPETokenizer(vocab='iupac')
-    token_ids = tokenizer.encode(sequence)
-    with torch.no_grad():
-        protein_embedding = torch.tensor([token_ids], dtype=torch.int64)
-    return protein_embedding.squeeze(0).numpy()
+        tokenizer = ProteinTokenizer()
+    return tokenizer.encode(sequence)
 
 
 def encode_3di_sequence(sa_sequence: str) -> np.ndarray:

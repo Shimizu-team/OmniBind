@@ -33,16 +33,17 @@ import numpy as np
 import pandas as pd
 import torch
 from tqdm import tqdm
-from tape import TAPETokenizer
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
-from omnibind.featurization import mol_features_from_mol, encode_3di_sequence
+from omnibind.featurization import (
+    mol_features_from_mol, encode_3di_sequence, ProteinTokenizer,
+)
 
 import warnings
 warnings.filterwarnings('ignore')
 
 
-def seq_cat(prot: str, tokenizer: TAPETokenizer) -> list:
+def seq_cat(prot: str, tokenizer) -> list:
     return tokenizer.encode(prot)
 
 
@@ -101,7 +102,7 @@ def convert_to_numpy(data_dir: str, source_dir: str, output_suffix: str = 'train
     # Amino acid sequences
     print('Featurizing AA sequences...')
     start = time.time()
-    tokenizer = TAPETokenizer(vocab='iupac')
+    tokenizer = ProteinTokenizer()
     aas = []
     for seq_id in tqdm(df.protein_id):
         prot = id2seq[seq_id]

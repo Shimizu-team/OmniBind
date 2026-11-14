@@ -12,12 +12,12 @@ import numpy as np
 import pandas as pd
 import torch
 from rdkit import Chem
-from tape import TAPETokenizer
 from omegaconf import DictConfig
 
 from omnibind.model import build_model
 from omnibind.featurization import (
-    mol_features_from_smiles, encode_aa_sequence, encode_3di_sequence, NUM_ATOM_FEAT,
+    mol_features_from_smiles, encode_aa_sequence, encode_3di_sequence,
+    ProteinTokenizer, NUM_ATOM_FEAT,
 )
 
 
@@ -87,7 +87,7 @@ def predict_single(
     sa_sequence: str,
     model: torch.nn.Module,
     cfg: DictConfig,
-    tokenizer: TAPETokenizer = None,
+    tokenizer: Optional[ProteinTokenizer] = None,
 ) -> dict:
     """Predict binding affinity for a single compound-protein pair.
 
@@ -97,14 +97,14 @@ def predict_single(
         sa_sequence: 3Di structural alphabet sequence of the target protein.
         model: Trained OmniBind model.
         cfg: Configuration.
-        tokenizer: TAPETokenizer (created if None).
+        tokenizer: ProteinTokenizer (created if None).
 
     Returns:
         Dict with 'smiles', 'predicted_ki', 'predicted_kd',
         'predicted_ic50', 'predicted_ec50' keys.
     """
     if tokenizer is None:
-        tokenizer = TAPETokenizer(vocab='iupac')
+        tokenizer = ProteinTokenizer()
 
     mol = Chem.MolFromSmiles(smiles)
     if mol is None:
@@ -159,7 +159,7 @@ def batch_predict_compounds(
     Returns:
         DataFrame with prediction results.
     """
-    tokenizer = TAPETokenizer(vocab='iupac')
+    tokenizer = ProteinTokenizer()
     results = []
 
     for i, row in smiles_df.iterrows():
@@ -221,7 +221,7 @@ def batch_predict_proteins(
     Returns:
         DataFrame with prediction results.
     """
-    tokenizer = TAPETokenizer(vocab='iupac')
+    tokenizer = ProteinTokenizer()
     results = []
 
     for protein_id, (aa_seq, sa_seq) in protein_data.items():

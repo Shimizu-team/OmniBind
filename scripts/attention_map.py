@@ -18,7 +18,6 @@ import warnings
 import numpy as np
 import torch
 from rdkit import Chem
-from tape import TAPETokenizer
 from omegaconf import DictConfig
 import hydra
 
@@ -27,6 +26,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from omnibind.model import build_model
 from omnibind.featurization import (
     mol_features_from_smiles, encode_aa_sequence, encode_3di_sequence,
+    ProteinTokenizer,
 )
 from omnibind.predict import _pack_single
 
@@ -48,7 +48,7 @@ def main(cfg: DictConfig):
 
     # Featurize
     atom_feature, adj = mol_features_from_smiles(smiles)
-    tokenizer = TAPETokenizer(vocab='iupac')
+    tokenizer = ProteinTokenizer()
     aa_processed = encode_aa_sequence(aa, tokenizer)
     sa_processed = encode_3di_sequence(sa)
 
